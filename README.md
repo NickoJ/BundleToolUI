@@ -1,2 +1,4 @@
 # BundleToolUI
-UI for https://github.com/google/bundletool
+UI for [BundleTool](https://github.com/google/bundletool)
+
+UI Framework: [AvloniaUI](https://github.com/AvaloniaUI/Avalonia) 
