@@ -24,13 +24,13 @@ namespace BundleToolUI.ViewModels
         
         private readonly Window _window;
 
-        private readonly IKeyTool _keyTool;
+        private readonly KeyTool _keyTool;
         private readonly CommandExecutor _executor;
 
         private string _lastExecutionMessage;
         private ObservableAsPropertyHelper<bool> _isOnBuildMode;
 
-        public MainWindowViewModel(Window window, IKeyTool keyTool, CommandExecutor executor)
+        public MainWindowViewModel(Window window, KeyTool keyTool, CommandExecutor executor)
         {
             _window = window;
             _keyTool = keyTool;

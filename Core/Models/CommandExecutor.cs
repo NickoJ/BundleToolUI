@@ -1,4 +1,4 @@
-using System;
+using System.Diagnostics;
 
 namespace BundleToolUI.Models
 {
@@ -21,7 +21,20 @@ namespace BundleToolUI.Models
             return Execute(command);
         }
 
-        protected abstract ExecuteResult Execute(string command);
+        protected abstract Process CreateProcess(string command);
+        
+        private ExecuteResult Execute(string command)
+        {
+            var process = CreateProcess(command);
+            
+            process.Start();
+            string message = process.StandardOutput.ReadToEnd();
+            string errorMessage = process.StandardError.ReadToEnd();
+            process.WaitForExit();
+            int exitCode = process.ExitCode;
+
+            return new ExecuteResult(exitCode, message, errorMessage);
+        }
 
     }
     

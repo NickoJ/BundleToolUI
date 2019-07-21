@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 using BundleToolUI.Models;
 
@@ -9,30 +8,22 @@ namespace BundleToolUI.MacOS
         
         public MacOsCommandExecutor(CommandBuilder builder) : base(builder) {}
 
-        protected override ExecuteResult Execute(string command)
+        protected override Process CreateProcess(string command)
         {
             command = command.Replace("\"", "\\\"");
 
-            var process = new Process
+            return new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "/bin/bash",
-                    Arguments = $"-c \"{command}\"",
+                    FileName = "CMD.exe",
+                    Arguments = $"/C {command}",
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false,
                     CreateNoWindow = true
                 }
             };
-
-            process.Start();
-            string message = process.StandardOutput.ReadToEnd();
-            string errorMessage = process.StandardError.ReadToEnd();
-            process.WaitForExit();
-            int exitCode = process.ExitCode;
-
-            return new ExecuteResult(exitCode, message, errorMessage);
         }
         
     }

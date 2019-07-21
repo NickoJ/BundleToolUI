@@ -8,9 +8,7 @@ namespace BundleToolUI.Win
         
         public WinCommandExecutor(CommandBuilder builder) : base(builder) {}
 
-        protected override ExecuteResult Execute(string command)
-        {
-            var process = new Process
+        protected override Process CreateProcess(string command) => new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
@@ -22,15 +20,6 @@ namespace BundleToolUI.Win
                     CreateNoWindow = true
                 }
             };
-            
-            process.Start();
-            string message = process.StandardOutput.ReadToEnd();
-            string errorMessage = process.StandardError.ReadToEnd();
-            process.WaitForExit();
-            int exitCode = process.ExitCode;
-
-            return new ExecuteResult(exitCode, message, errorMessage);
-        }
         
     }
 }
