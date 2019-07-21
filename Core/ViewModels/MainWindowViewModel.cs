@@ -185,11 +185,10 @@ namespace BundleToolUI.ViewModels
         private async void OnBundlePathSelectClick()
         {
             var filters = new List<FileDialogFilter>();
-            
-            var extensions = new List<string>();
-            extensions.Add(ExtAab);
-            
-            filters.Add(new FileDialogFilter { Extensions = extensions });
+
+            var extensions = new List<string> {ExtAab};
+
+            filters.Add(new FileDialogFilter { Name = "Android App Bundle", Extensions = extensions });
             
             var dialog = new OpenFileDialog
             {
@@ -214,10 +213,15 @@ namespace BundleToolUI.ViewModels
                     : DefaultOutputFilename;
             }
 
+            var filters = new List<FileDialogFilter>();
+            var extensions = new List<string> {ExtApks};
+            filters.Add(new FileDialogFilter { Name = "apks", Extensions = extensions});
+
             var dialog = new SaveFileDialog
             {
                 DefaultExtension = ExtApks,
                 InitialFileName = fileName,
+                Filters = filters,
                 Title = "Save..."
             };
 
@@ -231,12 +235,10 @@ namespace BundleToolUI.ViewModels
         private async void OnKeystorePathSelectClick()
         {
             var filters = new List<FileDialogFilter>();
-            
-            var extensions = new List<string>();
-            extensions.Add(ExtKeystore);
-            extensions.Add(ExtJks);
-            
-            filters.Add(new FileDialogFilter { Extensions = extensions });
+
+            var extensions = new List<string> { ExtKeystore, ExtJks };
+
+            filters.Add(new FileDialogFilter { Name = "keystore", Extensions = extensions });
             
             var dialog = new OpenFileDialog
             {

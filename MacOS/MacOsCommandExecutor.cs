@@ -26,7 +26,6 @@ namespace BundleToolUI.MacOS
                 }
             };
 
-            
             process.Start();
             string message = process.StandardOutput.ReadToEnd();
             string errorMessage = process.StandardError.ReadToEnd();
