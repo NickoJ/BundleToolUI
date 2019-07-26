@@ -198,8 +198,9 @@ namespace BundleToolUI.ViewModels
             };
             
             string[] result = await dialog.ShowAsync(_window);
-            if (result == null) return;
+            if (result?.Length == 0) return;
             
+            // ReSharper disable once PossibleNullReferenceException
             BundlePath = result[0];
         }
 
@@ -248,8 +249,9 @@ namespace BundleToolUI.ViewModels
             };
             
             string[] result = await dialog.ShowAsync(_window);
-            if (result == null) return;
+            if (result?.Length == 0) return;
             
+            // ReSharper disable once PossibleNullReferenceException
             KeystorePath = result[0];
         }
         
