@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BundleToolUI.Models
 {
@@ -15,10 +17,10 @@ namespace BundleToolUI.Models
 
         public ExecuteParams ExecuteParams { get; } = new ExecuteParams();
         
-        public ExecuteResult Execute()
+        public async ValueTask<ExecuteResult> ExecuteAsync()
         {
             string command = _builder.Build("bundletool.jar", ExecuteParams);
-            return Execute(command);
+            return await Task.Run(() => Execute(command));
         }
 
         protected abstract Process CreateProcess(string command);

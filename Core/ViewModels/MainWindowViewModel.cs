@@ -27,6 +27,8 @@ namespace BundleToolUI.ViewModels
         private readonly KeyTool _keyTool;
         private readonly CommandExecutor _executor;
 
+        private bool _processing;
+        
         private string _lastExecutionMessage;
         private ObservableAsPropertyHelper<bool> _isOnBuildMode;
 
@@ -166,6 +168,12 @@ namespace BundleToolUI.ViewModels
 
         private ExecuteParams ExecuteParams => _executor.ExecuteParams;
 
+        private bool Processing
+        {
+            get => _processing;
+            set => this.RaiseAndSetIfChanged(ref _processing, value);
+        }
+
         private string LastExecutionMessage
         {
             get => _lastExecutionMessage;
@@ -255,9 +263,11 @@ namespace BundleToolUI.ViewModels
             KeystorePath = result[0];
         }
         
-        private void OnExecuteClick()
+        private async void OnExecuteClick()
         {
-            var result = _executor.Execute();
+            Processing = true;
+            
+            var result = await _executor.ExecuteAsync();
 
             var sb = new StringBuilder();
             sb.AppendLine($"Last Execution: {DateTime.Now}");
@@ -266,6 +276,8 @@ namespace BundleToolUI.ViewModels
             sb.AppendLine($"Error message: {result.ErrorMessage}");
             
             LastExecutionMessage = sb.ToString();
+
+            Processing = false;
         }
 
     }

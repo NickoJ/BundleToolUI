@@ -246,6 +246,7 @@
                 Grid.RowSpan="2"
                 Content="Execute"
                 Command="{Binding OnExecuteClick}"
+                IsEnabled="{Binding !Processing}"
             />
             
         </Grid>
