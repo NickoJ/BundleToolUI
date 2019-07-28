@@ -4,14 +4,10 @@ namespace BundleToolUI.Models
     {
         
         public readonly int ExitCode;
-        public readonly string Message;
-        public readonly string ErrorMessage;
 
-        public ExecuteResult(int exitCode, string message, string errorMessage)
+        public ExecuteResult(int exitCode)
         {
             ExitCode = exitCode;
-            Message = message;
-            ErrorMessage = errorMessage;
         }
         
     }

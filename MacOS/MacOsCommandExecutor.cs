@@ -16,8 +16,8 @@ namespace BundleToolUI.MacOS
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "CMD.exe",
-                    Arguments = $"/C {command}",
+                    FileName = "/bin/bash",
+                    Arguments = $"-c \"{command}\"",
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false,

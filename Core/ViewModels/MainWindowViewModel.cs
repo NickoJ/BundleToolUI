@@ -29,14 +29,19 @@ namespace BundleToolUI.ViewModels
 
         private bool _processing;
         
-        private string _lastExecutionMessage;
+        private string _logs;
         private ObservableAsPropertyHelper<bool> _isOnBuildMode;
 
+        private Queue<string> _errorMessages = new Queue<string>();
+        
         public MainWindowViewModel(Window window, KeyTool keyTool, CommandExecutor executor)
         {
             _window = window;
             _keyTool = keyTool;
             _executor = executor;
+
+            _executor.LogMessage += PrintMessage;
+            _executor.ErrorMessage += AddErrorMessage;
 
             this.WhenAnyValue(x => x.BundlePath, x => x.ApksPath)
                 .Where(t => string.IsNullOrWhiteSpace(t.Item2))
@@ -174,11 +179,13 @@ namespace BundleToolUI.ViewModels
             set => this.RaiseAndSetIfChanged(ref _processing, value);
         }
 
-        private string LastExecutionMessage
+        private string Logs
         {
-            get => _lastExecutionMessage;
-            set => this.RaiseAndSetIfChanged(ref _lastExecutionMessage, value);
+            get => _logs;
+            set => this.RaiseAndSetIfChanged(ref _logs, value);
         }
+
+        private bool HasErrors => _errorMessages.Count > 0;
         
         private void UpdateAliases()
         {
@@ -266,20 +273,53 @@ namespace BundleToolUI.ViewModels
         private async void OnExecuteClick()
         {
             Processing = true;
-            
-            var result = await _executor.ExecuteAsync();
 
-            var sb = new StringBuilder();
-            sb.AppendLine($"Last Execution: {DateTime.Now}");
-            sb.AppendLine($"Exit code: {result.ExitCode}");
-            sb.AppendLine($"Message: {result.Message}");
-            sb.AppendLine($"Error message: {result.ErrorMessage}");
-            
-            LastExecutionMessage = sb.ToString();
+            Logs = $"Execution time: {DateTime.Now}";
 
-            Processing = false;
+            try
+            {
+                var result = await _executor.ExecuteAsync();
+                PrintMessage($"Exit code: {result.ExitCode}");
+            }
+            catch (Exception e)
+            {
+                AddErrorMessage($"{e.Message}\n");
+                AddErrorMessage(e.Source);
+                AddErrorMessage($"{e.StackTrace}\n");
+            }
+            finally
+            {
+
+                if (HasErrors)
+                {
+                    PrintMessage("----- Error -----");
+                    PrintErrorMessages();
+                    PrintMessage("----- Error -----");
+                }
+
+                PrintMessage($"Finish time: {DateTime.Now}\n");
+                
+                Processing = false;
+            }
+            
+//            var sb = new StringBuilder();
+//            sb.AppendLine($"Last Execution: {DateTime.Now}");
+//            sb.AppendLine($"Exit code: {result.ExitCode}");
+//            sb.AppendLine($"Message: {result.Message}");
+//            sb.AppendLine($"Error message: {result.ErrorMessage}");
+            
+//            LastExecutionMessage = sb.ToString();
         }
 
+        private void PrintMessage(string message) => Logs = $"{Logs}\n{message}";
+
+        private void AddErrorMessage(string message) => _errorMessages.Enqueue(message);
+
+        private void PrintErrorMessages()
+        {
+            while (_errorMessages.Count > 0) PrintMessage(_errorMessages.Dequeue());
+        }
+        
     }
     
 }

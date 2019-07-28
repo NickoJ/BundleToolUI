@@ -259,7 +259,7 @@
             AcceptsReturn="True" 
             TextWrapping="Wrap"
             IsReadOnly="True"
-            Text="{Binding LastExecutionMessage}"
+            Text="{Binding Logs}"
         />
         
     </Grid>
