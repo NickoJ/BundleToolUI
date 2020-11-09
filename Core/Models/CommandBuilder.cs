@@ -13,16 +13,16 @@ namespace BundleToolUI.Models
         private const string CommandBuildApks = "build-apks";
         private const string CommandInstallApks = "install-apks";
 
-        private const string FlagBundlePath = "--bundle";
-        private const string FlagOutputPath = "--output";
-        private const string FlagApksPath = "--apks";
-        private const string FlagOverwriteOutput = "--overwrite";
-        private const string FlagKeystorePath = "--ks";
-        private const string FlagKeystorePassword = "--ks-pass";
-        private const string FlagKeystoreAlias = "--ks-key-alias";
-        private const string FlagAliasPassword = "--key-pass";
-        private const string FlagApkWithDeviceTarget = "--connected-device";
-        private const string FlagDeviceId = "--device-id";
+        private const string BundlePath = "--bundle";
+        private const string OutputPath = "--output";
+        private const string ApksPath = "--apks";
+        private const string OverwriteOutput = "--overwrite";
+        private const string KeystorePath = "--ks";
+        private const string KeystorePassword = "--ks-pass";
+        private const string KeystoreAlias = "--ks-key-alias";
+        private const string AliasPassword = "--key-pass";
+        private const string ApkWithDeviceTarget = "--connected-device";
+        private const string DeviceId = "--device-id";
 
         private const string QualifierPassword = "pass";
         
@@ -32,7 +32,9 @@ namespace BundleToolUI.Models
 
             var sb = new StringBuilder();
 
-            var fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, bundleToolPath);
+            var processName = Process.GetCurrentProcess().MainModule?.FileName;
+            var dir = new FileInfo(processName!).DirectoryName;
+            var fullPath = Path.Combine(dir!, bundleToolPath);
             sb.Append("java -jar").Append(' ').Append(fullPath).Append(' ');
             
             switch (executeParams.ExecuteMode)
@@ -48,21 +50,21 @@ namespace BundleToolUI.Models
         {
             SetCommand(sb, CommandBuildApks);
             
-            AddFlag(sb, FlagBundlePath, executeParams.BundlePath);
-            AddFlag(sb, FlagOutputPath, executeParams.ApksPath);
-            if (executeParams.OverwriteOutput) AddFlag(sb, FlagOverwriteOutput);
+            AddFlag(sb, BundlePath, executeParams.BundlePath);
+            AddFlag(sb, OutputPath, executeParams.ApksPath);
+            if (executeParams.OverwriteOutput) AddFlag(sb, OverwriteOutput);
 
             AddKeystoreFlags(sb, executeParams);
-            if (executeParams.ApkWithDeviceTarget) AddFlag(sb, FlagApkWithDeviceTarget);
-            if (!string.IsNullOrWhiteSpace(executeParams.DeviceId)) AddFlag(sb, FlagDeviceId, executeParams.DeviceId);
+            if (executeParams.ApkWithDeviceTarget) AddFlag(sb, ApkWithDeviceTarget);
+            if (!string.IsNullOrWhiteSpace(executeParams.DeviceId)) AddFlag(sb, DeviceId, executeParams.DeviceId);
         }
 
         private static void BuildForApksInstall(StringBuilder sb, ExecuteParams executeParams)
         {
             SetCommand(sb, CommandInstallApks);
             
-            AddFlag(sb, FlagApksPath, executeParams.ApksPath);
-            if (!string.IsNullOrWhiteSpace(executeParams.DeviceId)) AddFlag(sb, FlagDeviceId, executeParams.DeviceId);
+            AddFlag(sb, ApksPath, executeParams.ApksPath);
+            if (!string.IsNullOrWhiteSpace(executeParams.DeviceId)) AddFlag(sb, DeviceId, executeParams.DeviceId);
         }
 
         private static void SetCommand(StringBuilder sb, string command)
@@ -74,10 +76,10 @@ namespace BundleToolUI.Models
         {
             if (string.IsNullOrWhiteSpace(executeParams.KeystorePath)) return;
             
-            AddFlag(sb, FlagKeystorePath, executeParams.KeystorePath);
-            AddFlag(sb, FlagKeystorePassword, QualifierPassword, executeParams.KeystorePassword);
-            AddFlag(sb, FlagKeystoreAlias, executeParams.KeystoreAlias);
-            AddFlag(sb, FlagAliasPassword, QualifierPassword, executeParams.AliasPassword);
+            AddFlag(sb, KeystorePath, executeParams.KeystorePath);
+            AddFlag(sb, KeystorePassword, QualifierPassword, executeParams.KeystorePassword);
+            AddFlag(sb, KeystoreAlias, executeParams.KeystoreAlias);
+            AddFlag(sb, AliasPassword, QualifierPassword, executeParams.AliasPassword);
         }
         
         private static void AddFlag(StringBuilder sb, string flag)
@@ -92,7 +94,7 @@ namespace BundleToolUI.Models
 
         private static void AddFlag(StringBuilder sb, string flag, string qualifier, string value)
         {
-            sb.Append(flag).Append('=').Append(qualifier).Append(':').Append(value).Append(' ');
+            sb.Append(flag).Append('=').Append('\"').Append(qualifier).Append(':').Append(value).Append('\"').Append(' ');
         }
         
     }

@@ -1,6 +1,5 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Logging.Serilog;
 using Avalonia.ReactiveUI;
 using BundleToolUI.Models;
 using BundleToolUI.ViewModels;
@@ -8,8 +7,7 @@ using BundleToolUI.Views;
 
 namespace BundleToolUI.Win
 {
-    
-    class Program
+    internal static class Program
     {
         static void Main(string[] args)
         {
@@ -17,10 +15,10 @@ namespace BundleToolUI.Win
         }
 
         // Avalonia configuration, don't remove; also used by visual designer.
-        public static AppBuilder BuildAvaloniaApp()
+        private static AppBuilder BuildAvaloniaApp()
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()
-                .LogToDebug()
+                .LogToTrace()
                 .UseReactiveUI();
 
         // Your application's entry point. Here you can initialize your MVVM framework, DI

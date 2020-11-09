@@ -7,7 +7,9 @@
     x:Class="BundleToolUI.Views.MainWindow"
     Title="BundleToolUI"
     MinWidth="585"
-    MinHeight="340"
+    MinHeight="500"
+    Width="585"
+    Height="500"
     CanResize="True"
     Padding="8"
 >
@@ -28,8 +30,9 @@
             <RowDefinition Height="Auto" />    
             <RowDefinition Height="Auto" />    
             <RowDefinition Height="Auto" />    
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />    
-            <RowDefinition Height="*" />    
         </Grid.RowDefinitions>
         
         <!-- Bundle path -->
@@ -260,6 +263,12 @@
             TextWrapping="Wrap"
             IsReadOnly="True"
             Text="{Binding Logs}"
+        />
+        
+        <ProgressBar
+            Grid.Row="13"
+            Margin="0, 4, 0, 0"
+            IsIndeterminate="{Binding Processing}"
         />
         
     </Grid>

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 using System.Reactive.Linq;
-using System.Text;
 using Avalonia.Controls;
 using BundleToolUI.Models;
 using DynamicData;
@@ -26,14 +26,11 @@ namespace BundleToolUI.ViewModels
 
         private readonly KeyTool _keyTool;
         private readonly CommandExecutor _executor;
+        private readonly ObservableAsPropertyHelper<bool> _isOnBuildMode;
 
         private bool _processing;
-        
         private string _logs;
-        private ObservableAsPropertyHelper<bool> _isOnBuildMode;
 
-        private Queue<string> _errorMessages = new Queue<string>();
-        
         public MainWindowViewModel(Window window, KeyTool keyTool, CommandExecutor executor)
         {
             _window = window;
@@ -41,12 +38,11 @@ namespace BundleToolUI.ViewModels
             _executor = executor;
 
             _executor.LogMessage += PrintMessage;
-            _executor.ErrorMessage += AddErrorMessage;
 
             this.WhenAnyValue(x => x.BundlePath, x => x.ApksPath)
                 .Where(t => string.IsNullOrWhiteSpace(t.Item2))
                 .Where(t => !string.IsNullOrWhiteSpace(t.Item1))
-                .Where(t => string.Equals(Path.GetExtension(t.Item1).Substring(1), ExtAab))
+                .Where(t => string.Equals(Path.GetExtension(t.Item1)!.Substring(1), ExtAab))
                 .Select(t => Path.ChangeExtension(t.Item1, ExtApks))
                 .Subscribe(path => ApksPath = path);
 
@@ -185,8 +181,6 @@ namespace BundleToolUI.ViewModels
             set => this.RaiseAndSetIfChanged(ref _logs, value);
         }
 
-        private bool HasErrors => _errorMessages.Count > 0;
-        
         private void UpdateAliases()
         {
             if (!_keyTool.GetAliases(KeystorePath, KeystorePassword, out var newAliases)) return;
@@ -274,52 +268,30 @@ namespace BundleToolUI.ViewModels
         {
             Processing = true;
 
-            Logs = $"Execution time: {DateTime.Now}";
+            Logs = $"Execution time: {DateTime.Now.ToString(CultureInfo.InvariantCulture)}";
 
             try
             {
                 var result = await _executor.ExecuteAsync();
-                PrintMessage($"Exit code: {result.ExitCode}");
+                PrintMessage($"Exit code: {result.ExitCode.ToString()}");
             }
             catch (Exception e)
             {
-                AddErrorMessage($"{e.Message}\n");
-                AddErrorMessage(e.Source);
-                AddErrorMessage($"{e.StackTrace}\n");
+                PrintMessage($"{e.Message}\n");
+                PrintMessage(e.Source);
+                PrintMessage($"{e.StackTrace}\n");
             }
             finally
             {
 
-                if (HasErrors)
-                {
-                    PrintMessage("----- Error -----");
-                    PrintErrorMessages();
-                    PrintMessage("----- Error -----");
-                }
-
-                PrintMessage($"Finish time: {DateTime.Now}\n");
+                PrintMessage($"Finish time: {DateTime.Now.ToString(CultureInfo.InvariantCulture)}\n");
                 
                 Processing = false;
             }
-            
-//            var sb = new StringBuilder();
-//            sb.AppendLine($"Last Execution: {DateTime.Now}");
-//            sb.AppendLine($"Exit code: {result.ExitCode}");
-//            sb.AppendLine($"Message: {result.Message}");
-//            sb.AppendLine($"Error message: {result.ErrorMessage}");
-            
-//            LastExecutionMessage = sb.ToString();
         }
 
         private void PrintMessage(string message) => Logs = $"{Logs}\n{message}";
 
-        private void AddErrorMessage(string message) => _errorMessages.Enqueue(message);
-
-        private void PrintErrorMessages()
-        {
-            while (_errorMessages.Count > 0) PrintMessage(_errorMessages.Dequeue());
-        }
-        
     }
     
 }

@@ -18,30 +18,31 @@ namespace BundleToolUI.Models
         public ExecuteParams ExecuteParams { get; } = new ExecuteParams();
 
         public event Action<string> LogMessage;
-        public event Action<string> ErrorMessage;
 
         public Task<ExecuteResult> ExecuteAsync()
         {
-            var tcs = new TaskCompletionSource<ExecuteResult>();
+            var taskCompletionSource = new TaskCompletionSource<ExecuteResult>();
             
             string command = _builder.Build("bundletool.jar", ExecuteParams);
             
             var process = CreateProcess(command);
 
             process.OutputDataReceived += (sender, args) => LogMessage?.Invoke(args.Data);
-            process.ErrorDataReceived += (sender, args) => ErrorMessage?.Invoke(args.Data);
+            process.ErrorDataReceived += (sender, args) => LogMessage?.Invoke(args.Data);
 
+            process.EnableRaisingEvents = true;
             process.Exited += (sender, args) =>
             {
-                tcs.SetResult(new ExecuteResult(process.ExitCode));
+                var exitCode = process.ExitCode;
                 process.Dispose();
+                taskCompletionSource.SetResult(new ExecuteResult(exitCode));
             };
             
             process.Start();
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
 
-            return tcs.Task;
+            return taskCompletionSource.Task;
         }
 
         protected abstract Process CreateProcess(string command);

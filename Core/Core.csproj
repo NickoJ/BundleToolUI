@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <LangVersion>9</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Models\" />
@@ -13,8 +14,8 @@
     <AvaloniaResource Include="Assets\*" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.8.999-cibuild0003269-beta" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.8.999-cibuild0003269-beta" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="0.8.999-cibuild0003269-beta" />
+    <PackageReference Include="Avalonia" Version="0.10.0-preview6" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.0-preview6" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.0-preview6" />
   </ItemGroup>
 </Project>
