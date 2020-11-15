@@ -12,6 +12,7 @@ namespace BundleToolUI.Models
 
         private const string CommandBuildApks = "build-apks";
         private const string CommandInstallApks = "install-apks";
+        private const string CommandShowApkSize = "get-size total"; 
 
         private const string BundlePath = "--bundle";
         private const string OutputPath = "--output";
@@ -38,6 +39,7 @@ namespace BundleToolUI.Models
             {
                 case ExecuteMode.BuildApks: BuildForApksBuild(sb, executeParams); break;
                 case ExecuteMode.InstallApks: BuildForApksInstall(sb, executeParams); break;
+                case ExecuteMode.ShowApkSize: BuildForShowApkSize(sb, executeParams); break;
             }
 
             return sb.ToString();
@@ -62,6 +64,13 @@ namespace BundleToolUI.Models
             
             AddFlag(sb, ApksPath, executeParams.ApksPath);
             if (!string.IsNullOrWhiteSpace(executeParams.DeviceId)) AddFlag(sb, DeviceId, executeParams.DeviceId);
+        }
+
+        private static void BuildForShowApkSize(StringBuilder sb, ExecuteParams executeParams)
+        {
+            SetCommand(sb, CommandShowApkSize);
+            
+            AddFlag(sb, ApksPath, executeParams.ApksPath);
         }
 
         private static void SetCommand(StringBuilder sb, string command)

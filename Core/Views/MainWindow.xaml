@@ -343,7 +343,7 @@
                 Grid.Column="1" Grid.Row="1"
                 Margin="0, 0, 4, 0">
                 <ComboBox.Items>
-                    <Binding Path="ExecuteModes" />
+                    <Binding Path="ExecuteModesNames" />
                 </ComboBox.Items>
                 <ComboBox.SelectedIndex>
                     <Binding Path="SelectedExecuteModeIndex" />

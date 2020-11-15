@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
 using Avalonia.Controls;
@@ -36,6 +37,8 @@ namespace BundleToolUI.ViewModels
         
         private bool _processing;
 
+        private readonly ExecuteMode[] _executeModes;
+        
         public MainWindowViewModel(Window window, KeyTool keyTool, CommandExecutor executor,
             TemplatesModule templatesModule)
         {
@@ -60,12 +63,19 @@ namespace BundleToolUI.ViewModels
                 .Where(x => (File.GetAttributes(x.Path) & FileAttributes.Directory) != FileAttributes.Directory)
                 .Where(x => File.Exists(x.Path))
                 .Subscribe(x => UpdateAliases());
-                
-            ExecuteModes = new ObservableCollection<ExecuteMode>(new [] { ExecuteMode.BuildApks, ExecuteMode.InstallApks });
+
+            _executeModes = new[]
+            {
+                ExecuteMode.BuildApks,
+                ExecuteMode.InstallApks,
+                ExecuteMode.ShowApkSize
+            };
+            
+            ExecuteModesNames = new ObservableCollection<string>(_executeModes.Select(m => m.GetModeName()));
             AvailableAliases = new ObservableCollection<string>();
             
             _isOnBuildMode = this.WhenAnyValue(x => x.SelectedExecuteModeIndex)
-                .Select(index => ExecuteModes[index])
+                .Select(index => _executeModes[index])
                 .Select(mode => mode == ExecuteMode.BuildApks)
                 .ToProperty(this, x => x.IsOnBuildMode);
         }
@@ -168,17 +178,17 @@ namespace BundleToolUI.ViewModels
             get => ExecuteParams.DeviceId;
             set => ExecuteParams.DeviceId = value;
         }
-
-        private ObservableCollection<ExecuteMode> ExecuteModes { get; }
+        
+        private ObservableCollection<string> ExecuteModesNames { get; }
 
         private int SelectedExecuteModeIndex
         {
-            get => ExecuteModes.IndexOf(ExecuteParams.ExecuteMode);
+            get => ExecuteModesNames.IndexOf(ExecuteParams.ExecuteMode.GetModeName());
             set
             {
                 if (SelectedExecuteModeIndex == value) return;
 
-                ExecuteParams.ExecuteMode = ExecuteModes[value];
+                ExecuteParams.ExecuteMode = _executeModes[value];
                 this.RaisePropertyChanged(nameof(SelectedExecuteModeIndex));
             }
         }
