@@ -32,10 +32,7 @@ namespace BundleToolUI.Models
 
             var sb = new StringBuilder();
 
-            var processName = Process.GetCurrentProcess().MainModule?.FileName;
-            var dir = new FileInfo(processName!).DirectoryName;
-            var fullPath = Path.Combine(dir!, bundleToolPath);
-            sb.Append("java -jar").Append(' ').Append(fullPath).Append(' ');
+            sb.Append("java -jar").Append(' ').Append(executeParams.BundleToolPath).Append(' ');
             
             switch (executeParams.ExecuteMode)
             {

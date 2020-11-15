@@ -27,9 +27,10 @@ namespace BundleToolUI.Win
         {
             var keytool = new WinKeyTool();
             var commandExecutor = new WinCommandExecutor(new CommandBuilder());
+            var templatesModule = new TemplatesModule();
 
             var window = new MainWindow();
-            window.DataContext = new MainWindowViewModel(window, keytool, commandExecutor);
+            window.DataContext = new MainWindowViewModel(window, keytool, commandExecutor, templatesModule);
 
             app.Run(window);
         }

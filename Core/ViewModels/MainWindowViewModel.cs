@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Reactive.Linq;
+using System.Text;
 using Avalonia.Controls;
 using BundleToolUI.Models;
 using DynamicData;
@@ -19,6 +20,8 @@ namespace BundleToolUI.ViewModels
         private const string ExtApks = "apks";
         private const string ExtKeystore = "keystore";
         private const string ExtJks = "jks";
+        private const string ExtJar = "jar";
+        private const string ExtBundleTemplate = "bndltmplt";
 
         private const string DefaultOutputFilename = "output." + ExtApks; 
         
@@ -26,16 +29,20 @@ namespace BundleToolUI.ViewModels
 
         private readonly KeyTool _keyTool;
         private readonly CommandExecutor _executor;
+        private readonly TemplatesModule _templatesModule;
         private readonly ObservableAsPropertyHelper<bool> _isOnBuildMode;
 
+        private readonly StringBuilder _logs = new StringBuilder();
+        
         private bool _processing;
-        private string _logs;
 
-        public MainWindowViewModel(Window window, KeyTool keyTool, CommandExecutor executor)
+        public MainWindowViewModel(Window window, KeyTool keyTool, CommandExecutor executor,
+            TemplatesModule templatesModule)
         {
-            _window = window;
-            _keyTool = keyTool;
-            _executor = executor;
+            _window = window ?? throw new ArgumentNullException(nameof(window));
+            _keyTool = keyTool ?? throw new ArgumentNullException(nameof(keyTool));
+            _executor = executor ?? throw new ArgumentNullException(nameof(executor));
+            _templatesModule = templatesModule ?? throw new ArgumentNullException(nameof(templatesModule));
 
             _executor.LogMessage += PrintMessage;
 
@@ -63,6 +70,17 @@ namespace BundleToolUI.ViewModels
                 .ToProperty(this, x => x.IsOnBuildMode);
         }
 
+        private string BundleToolPath
+        {
+            get => ExecuteParams.BundleToolPath;
+            set
+            {
+                if (string.Equals(ExecuteParams.BundleToolPath, value)) return;
+                ExecuteParams.BundleToolPath = value;
+                this.RaisePropertyChanged(nameof(BundleToolPath));
+            }
+        }
+        
         private string BundlePath
         {
             get => ExecuteParams.BundlePath;
@@ -175,11 +193,7 @@ namespace BundleToolUI.ViewModels
             set => this.RaiseAndSetIfChanged(ref _processing, value);
         }
 
-        private string Logs
-        {
-            get => _logs;
-            set => this.RaiseAndSetIfChanged(ref _logs, value);
-        }
+        private string Logs => _logs.ToString();
 
         private void UpdateAliases()
         {
@@ -190,13 +204,87 @@ namespace BundleToolUI.ViewModels
 
             SelectedAliasIndex = SelectedAliasIndex;
         }
-        
+
+        private async void OpenTemplate()
+        {
+            var filters = new List<FileDialogFilter>();
+            var extensions = new List<string> {ExtBundleTemplate};
+            filters.Add(new FileDialogFilter { Name = "Template", Extensions = extensions});
+
+            var dialog = new OpenFileDialog
+            {
+                AllowMultiple = false,
+                Filters = filters,
+                Title = "Select template"
+            };
+
+            var result = await dialog.ShowAsync(_window);
+            if (result is null || result.Length == 0) return;
+            
+            if (!_templatesModule.TryLoadTemplate(result[0], out var template)) return;
+
+            ApplyTemplate(template);
+        }
+
+        private void SaveTemplate()
+        {
+            if (string.IsNullOrWhiteSpace(_templatesModule.CurrentTemplatePath))
+            {
+                SaveTemplateAs();
+            }
+            else
+            {
+                SaveTemplate(_templatesModule.CurrentTemplatePath);
+            }
+        }
+
+        private async void SaveTemplateAs()
+        {
+            var filters = new List<FileDialogFilter>();
+            var extensions = new List<string> {ExtBundleTemplate};
+            filters.Add(new FileDialogFilter { Name = "Template", Extensions = extensions});
+
+            var dialog = new SaveFileDialog
+            {
+                Filters = filters,
+                Title = "Select template"
+            };
+            
+            var result = await dialog.ShowAsync(_window);
+            if (result is null || result.Length == 0) return;
+            
+            SaveTemplate(result);
+        }
+
+        private void SaveTemplate(string path)
+        {
+            var template = GenerateTemplate();
+            _templatesModule.SaveTemplate(path, template);
+        }
+
+        private async void OnBundleToolPathSelectClick()
+        {
+            var filters = new List<FileDialogFilter>();
+            var extensions = new List<string> {ExtJar};
+            filters.Add(new FileDialogFilter { Name = "BundleTool", Extensions = extensions });
+            
+            var dialog = new OpenFileDialog
+            {
+                AllowMultiple = false,
+                Filters = filters,
+                Title = "Select BundleTool",
+            };
+            
+            var result = await dialog.ShowAsync(_window);
+            if (result is null || result.Length == 0) return;
+            
+            BundleToolPath = result[0];
+        }
+
         private async void OnBundlePathSelectClick()
         {
             var filters = new List<FileDialogFilter>();
-
             var extensions = new List<string> {ExtAab};
-
             filters.Add(new FileDialogFilter { Name = "Android App Bundle", Extensions = extensions });
             
             var dialog = new OpenFileDialog
@@ -257,18 +345,19 @@ namespace BundleToolUI.ViewModels
                 Title = "Select keystore"
             };
             
-            string[] result = await dialog.ShowAsync(_window);
+            var result = await dialog.ShowAsync(_window);
             if (result?.Length == 0) return;
             
             // ReSharper disable once PossibleNullReferenceException
             KeystorePath = result[0];
         }
-        
+
         private async void OnExecuteClick()
         {
             Processing = true;
 
-            Logs = $"Execution time: {DateTime.Now.ToString(CultureInfo.InvariantCulture)}";
+            _logs.Clear();
+            PrintMessage($"Execution time: {DateTime.Now.ToString(CultureInfo.InvariantCulture)}");
 
             try
             {
@@ -289,9 +378,28 @@ namespace BundleToolUI.ViewModels
                 Processing = false;
             }
         }
+        
+        private Template GenerateTemplate()
+        {
+            return new Template(_executor.ExecuteParams);
+        }
 
-        private void PrintMessage(string message) => Logs = $"{Logs}\n{message}";
+        private void ApplyTemplate(Template template)
+        {
+            BundleToolPath = template.BundleToolPath;
+            BundlePath = template.BundlePath;
+            ApksPath = template.ApksPath;
 
+            OverwriteOutput = template.OverwriteOutput;
+
+            KeystorePath = template.KeystorePath;
+        }
+
+        private void PrintMessage(string message)
+        {
+            _logs.AppendLine(message);
+            this.RaisePropertyChanged(nameof(Logs));
+        }
     }
     
 }

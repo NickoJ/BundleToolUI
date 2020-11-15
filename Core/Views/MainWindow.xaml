@@ -13,7 +13,7 @@
     CanResize="True"
     Padding="8"
 >
-
+ 
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -30,87 +30,112 @@
             <RowDefinition Height="Auto" />    
             <RowDefinition Height="Auto" />    
             <RowDefinition Height="Auto" />    
+            <RowDefinition Height="Auto" />    
+            <RowDefinition Height="Auto" />    
+            <RowDefinition Height="Auto" />    
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />    
         </Grid.RowDefinitions>
+
+        <DockPanel
+            Grid.Row="0">
+            <Menu DockPanel.Dock="Top">
+                <MenuItem Header="_File">
+                    <MenuItem Header="_Open template...">
+                        <MenuItem.Command>
+                            <Binding Path="OpenTemplate" />
+                        </MenuItem.Command>
+                    </MenuItem>
+                    <Separator/>
+                    <MenuItem Header="_Save template">
+                        <MenuItem.Command>
+                            <Binding Path="SaveTemplate" />
+                        </MenuItem.Command>
+                    </MenuItem>
+                    <MenuItem Header="Save template as...">
+                        <MenuItem.Command>
+                            <Binding Path="SaveTemplateAs"/>
+                        </MenuItem.Command>
+                    </MenuItem>
+                </MenuItem>
+            </Menu>
+        </DockPanel>
         
-        <!-- Bundle path -->
+        <!-- BundleTool path -->
         <TextBlock
-            Grid.Row="0"
+            Grid.Row="1"
             Text="Bundle path:"
         />
         <Grid
-            Grid.Row="1"
+            Grid.Row="2"
             Margin="0, 0, 0, 4"
         >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="32" />
             </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition/>    
-            </Grid.RowDefinitions>
             
             <TextBox 
                 Grid.Column="0" Grid.Row="0"
                 Margin="0, 0, 4, 0"
-                IsEnabled="{Binding IsOnBuildMode}"
-                Watermark="Path/to/AndroidAppBundle"
-                Text="{Binding BundlePath}"
-            />
+                Watermark="Path/to/BundleTool">
+                <TextBox.Text>
+                    <Binding Path="BundleToolPath" />
+                </TextBox.Text>
+            </TextBox>
+            <Button
+                Content="..."
+                Grid.Column="1" Grid.Row="0">
+                <Button.Command>
+                    <Binding Path="OnBundleToolPathSelectClick" />
+                </Button.Command>
+            </Button>
+        </Grid>
+        
+        <!-- Bundle path -->
+        <TextBlock
+            Grid.Row="3"
+            Text="Bundle path:"
+        />
+        <Grid
+            Grid.Row="4"
+            Margin="0, 0, 0, 4"
+        >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="32" />
+            </Grid.ColumnDefinitions>
+
+            <TextBox 
+                         Grid.Column="0" Grid.Row="0"
+                         Margin="0, 0, 4, 0"
+                         Watermark="Path/to/AndroidAppBundle"
+                     >
+                <TextBox.IsEnabled>
+                    <Binding Path="IsOnBuildMode" />
+                </TextBox.IsEnabled>
+                <TextBox.Text>
+                    <Binding Path="BundlePath" />
+                </TextBox.Text>
+            </TextBox>
             <Button
                 Content="..."
                 Grid.Column="1" Grid.Row="0"
-                IsEnabled="{Binding IsOnBuildMode}"
-                Command="{Binding OnBundlePathSelectClick}"
-            />
+            >
+                <Button.IsEnabled>
+                    <Binding Path="IsOnBuildMode" />
+                </Button.IsEnabled>
+                <Button.Command>
+                    <Binding Path="OnBundlePathSelectClick" />
+                </Button.Command>
+            </Button>
         </Grid>
         
         <!-- Apks path -->
         <TextBlock
-            Grid.Row="2"
-            Text="Apks path:"
-        />
-        <Grid
-            Grid.Row="3"
-            Margin="0, 0, 0, 4"
-        >
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="32" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition/>    
-            </Grid.RowDefinitions>
-            
-            <TextBox 
-                Grid.Column="0" Grid.Row="0"
-                Margin="0, 0, 4, 0"
-                Watermark="Path/to/apks/file" 
-                Text="{Binding ApksPath}"
-            />
-            <Button
-                Content="..."
-                Grid.Column="1" Grid.Row="0"
-                Command="{Binding OnApksPathSelectClick}"
-            />
-        </Grid>
-        
-        <!-- Overwrite output -->
-        <CheckBox 
-            Grid.Row="4"
-            IsEnabled="{Binding IsOnBuildMode}"
-            IsChecked="{Binding OverwriteOutput}"
-            Margin="0, 0, 0, 4"
-            Content="Overwrite output"
-        />
-        
-        <!-- Keystore path -->
-        <TextBlock
             Grid.Row="5"
-            Margin="0, 4, 0, 4"
-            Text="Keystore path (if empty - sign with debug):"
+            Text="Apks path:"
         />
         <Grid
             Grid.Row="6"
@@ -120,28 +145,83 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="32" />
             </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition/>    
-            </Grid.RowDefinitions>
+
+            <TextBox 
+                Grid.Column="0" Grid.Row="0"
+                Margin="0, 0, 4, 0"
+                Watermark="Path/to/apks/file"
+            >
+                <TextBox.Text>
+                    <Binding Path="ApksPath" />
+                </TextBox.Text>
+            </TextBox>
+            <Button
+                Content="..."
+                Grid.Column="1" Grid.Row="0"
+            >
+                <Button.Command>
+                    <Binding Path="OnApksPathSelectClick" />
+                </Button.Command>
+            </Button>
+        </Grid>
+        
+        <!-- Overwrite output -->
+        <CheckBox 
+            Grid.Row="7"
+            Margin="0, 0, 0, 4"
+            Content="Overwrite output"
+        >
+            <CheckBox.IsEnabled>
+                <Binding Path="IsOnBuildMode" />
+            </CheckBox.IsEnabled>
+            <CheckBox.IsChecked>
+                <Binding Path="OverwriteOutput" />
+            </CheckBox.IsChecked>
+        </CheckBox>
+
+        <!-- Keystore path -->
+        <TextBlock
+            Grid.Row="8"
+            Margin="0, 4, 0, 4"
+            Text="Keystore path (if empty - sign with debug):"
+        />
+        <Grid
+            Grid.Row="9"
+            Margin="0, 0, 0, 4"
+        >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="32" />
+            </Grid.ColumnDefinitions>
             
             <TextBox 
                 Grid.Column="0" Grid.Row="0"
                 Margin="0, 0, 4, 0"
-                IsEnabled="{Binding IsOnBuildMode}"
                 Watermark="Path/to/keystore"
-                Text="{Binding KeystorePath}"
-            />
+            >
+                <TextBox.IsEnabled>
+                    <Binding Path="IsOnBuildMode" />
+                </TextBox.IsEnabled>
+                <TextBox.Text>
+                    <Binding Path="KeystorePath" />
+                </TextBox.Text>
+            </TextBox>
             <Button
                 Content="..."
                 Grid.Column="1" Grid.Row="0"
-                IsEnabled="{Binding IsOnBuildMode}"
-                Command="{Binding OnKeystorePathSelectClick}"
-            />
+            >
+                <Button.IsEnabled>
+                    <Binding Path="IsOnBuildMode" />
+                </Button.IsEnabled>
+                <Button.Command>
+                    <Binding Path="OnKeystorePathSelectClick" />
+                </Button.Command>
+            </Button>
         </Grid>
         
         <!-- Keystore pass, Keystore alias and alias pass -->
         <Grid
-            Grid.Row="7"
+            Grid.Row="10"
             Margin="0, 0, 0, 4"
         >
             <Grid.ColumnDefinitions>
@@ -163,23 +243,34 @@
                 Grid.Column="0" Grid.Row="1"
                 Margin="0, 0, 4, 0"
                 PasswordChar="*"
-                IsEnabled="{Binding IsOnBuildMode}"
                 Watermark="Keystore password"
-                Text="{Binding KeystorePassword}"
-            />
-            
+            >
+                <TextBox.Text>
+                    <Binding Path="KeystorePassword" />
+                </TextBox.Text>
+                <TextBox.IsEnabled>
+                    <Binding Path="IsOnBuildMode" />
+                </TextBox.IsEnabled>
+            </TextBox>
+
             <!-- Keystore alias -->
             <TextBlock
                 Grid.Column="1" Grid.Row="0"
                 Text="Keystore alias:"
             />
             <ComboBox
-                Grid.Column="1" Grid.Row="1"
-                IsEnabled="{Binding IsOnBuildMode}"
-                Items="{Binding AvailableAliases}"
-                SelectedIndex="{Binding SelectedAliasIndex}"
-            />
-            
+                Grid.Column="1" Grid.Row="1">
+                <ComboBox.IsEnabled>
+                    <Binding Path="IsOnBuildMode" />
+                </ComboBox.IsEnabled>
+                <ComboBox.Items>
+                    <Binding Path="AvailableAliases" />
+                </ComboBox.Items>
+                <ComboBox.SelectedIndex>
+                    <Binding Path="SelectedAliasIndex" />
+                </ComboBox.SelectedIndex>
+            </ComboBox>
+
             <!-- Alias pass -->
             <TextBlock
                 Grid.Column="2" Grid.Row="0"
@@ -189,36 +280,48 @@
                 Grid.Column="2" Grid.Row="1"
                 Margin="4, 0, 0, 0"
                 PasswordChar="*"
-                IsEnabled="{Binding IsOnBuildMode}"
                 Watermark="Alias password"
-                Text="{Binding AliasPassword}"
-            />
+            >
+                <TextBox.IsEnabled>
+                    <Binding Path="IsOnBuildMode" />
+                </TextBox.IsEnabled>
+                <TextBox.Text>
+                    <Binding Path="AliasPassword" />
+                </TextBox.Text>
+            </TextBox>
         </Grid>
         
         <!-- Build APK with connected device target -->
         <CheckBox 
-            Grid.Row="8"
+            Grid.Row="11"
             Margin="0, 4, 0, 4"
             Content="Build APK with connected device target"
-            IsEnabled="{Binding IsOnBuildMode}"
-            IsChecked="{Binding ApkWithDeviceTarget}"
-        />
-        
+        >
+            <CheckBox.IsEnabled>
+                <Binding Path="IsOnBuildMode" />
+            </CheckBox.IsEnabled>
+            <CheckBox.IsChecked>
+                <Binding Path="ApkWithDeviceTarget" />
+            </CheckBox.IsChecked>
+        </CheckBox>
+
         <!-- Device ID -->
         <TextBlock
-            Grid.Row="9"
+            Grid.Row="12"
             Text="Device ID (Empty if connected only one device):"
         />
         <TextBox 
-            Grid.Row="10"
+            Grid.Row="13"
             Margin="0, 0, 4, 0"
-            Watermark="Device ID"
-            Text="{Binding DeviceId}"
-        />
-        
+            Watermark="Device ID">
+            <TextBox.Text>
+                <Binding Path="DeviceId" />
+            </TextBox.Text>
+        </TextBox>
+
         <!-- Execute mode and execute button -->
         <Grid
-            Grid.Row="11"
+            Grid.Row="14"
             Margin="0, 4, 0, 0"
         >
             <Grid.ColumnDefinitions>
@@ -238,39 +341,54 @@
             />
             <ComboBox
                 Grid.Column="1" Grid.Row="1"
-                Margin="0, 0, 4, 0"
-                Items="{Binding ExecuteModes}"
-                SelectedIndex="{Binding SelectedExecuteModeIndex}"
-            />
-            
+                Margin="0, 0, 4, 0">
+                <ComboBox.Items>
+                    <Binding Path="ExecuteModes" />
+                </ComboBox.Items>
+                <ComboBox.SelectedIndex>
+                    <Binding Path="SelectedExecuteModeIndex" />
+                </ComboBox.SelectedIndex>
+            </ComboBox>
+
             <!-- Execute button -->
             <Button
                 Grid.Column="2" Grid.Row="0"
                 Grid.RowSpan="2"
                 Content="Execute"
-                Command="{Binding OnExecuteClick}"
-                IsEnabled="{Binding !Processing}"
-            />
-            
+            >
+                <Button.IsEnabled>
+                    <Binding Path="!Processing" />
+                </Button.IsEnabled>
+                <Button.Command>
+                    <Binding Path="OnExecuteClick" />
+                </Button.Command>
+            </Button>
+
         </Grid>
         
         <!-- Execute console -->
         
         <TextBox
-            Grid.Row="12"
+            Grid.Row="15"
             Margin="0, 4, 0, 0"
             AcceptsReturn="True" 
             TextWrapping="Wrap"
             IsReadOnly="True"
-            Text="{Binding Logs}"
-        />
-        
+        >
+            <TextBox.Text>
+                <Binding Path="Logs" />
+            </TextBox.Text>
+        </TextBox>
+
         <ProgressBar
-            Grid.Row="13"
+            Grid.Row="16"
             Margin="0, 4, 0, 0"
-            IsIndeterminate="{Binding Processing}"
-        />
-        
+        >
+            <ProgressBar.IsIndeterminate>
+                <Binding Path="Processing" />
+            </ProgressBar.IsIndeterminate>
+        </ProgressBar>
+
     </Grid>
         
 </Window>

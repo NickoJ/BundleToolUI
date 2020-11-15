@@ -3,7 +3,7 @@ using BundleToolUI.Models;
 
 namespace BundleToolUI.Win
 {
-    public class WinKeyTool : KeyTool
+    public sealed class WinKeyTool : KeyTool
     {
         
         protected override Process CreateProcess(string keystorePath, string keystorePassword) =>
