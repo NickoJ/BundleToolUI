@@ -95,7 +95,7 @@ namespace BundleToolUI.Models
         
         private static void AddFlag(StringBuilder sb, string flag, string value)
         {
-            sb.Append(flag).Append('=').Append(value).Append(' ');
+            sb.Append(flag).Append('=').Append('\"').Append(value).Append('\"').Append(' ');
         }
 
         private static void AddFlag(StringBuilder sb, string flag, string qualifier, string value)
