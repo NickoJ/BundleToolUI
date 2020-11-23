@@ -29,7 +29,8 @@ namespace BundleToolUI.MacOS
             var commandExecutor = new MacOsCommandExecutor(new CommandBuilder());
 
             var window = new MainWindow();
-            window.DataContext = new MainWindowViewModel(window, keytool, commandExecutor);
+            var templatesModule = new TemplatesModule();
+            window.DataContext = new MainWindowViewModel(window, keytool, commandExecutor, templatesModule);
 
             app.Run(window);
         }
