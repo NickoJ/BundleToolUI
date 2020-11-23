@@ -9,6 +9,7 @@ namespace BundleToolUI.Models
         
         public Template(ExecuteParams parameters)
         {
+            KeyToolPath = parameters.KeyToolPath;
             BundleToolPath = parameters.BundleToolPath;
             BundlePath = parameters.BundlePath;
             ApksPath = parameters.ApksPath;
@@ -16,6 +17,7 @@ namespace BundleToolUI.Models
             KeystorePath = parameters.KeystorePath;
         }
         
+        [JsonProperty] public string KeyToolPath { get; private set; }
         [JsonProperty] public string BundleToolPath { get; private set; }
         [JsonProperty] public string BundlePath { get; private set; }
         [JsonProperty] public string ApksPath { get; private set; }

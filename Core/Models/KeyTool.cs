@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -10,9 +11,11 @@ namespace BundleToolUI.Models
     public abstract class KeyTool
     {
 
-        public bool GetAliases(string keystorePath, string keystorePassword, out List<string> aliases)
+        public event Action<string> LogError;
+        
+        public bool GetAliases(string keyToolPath, string keystorePath, string keystorePassword, out List<string> aliases)
         {
-            var process = CreateProcess(keystorePath, keystorePassword);
+            using var process = CreateProcess(keyToolPath, keystorePath, keystorePassword);
 
             int exitCode;
             string message;
@@ -29,6 +32,8 @@ namespace BundleToolUI.Models
             {
                 exitCode = 1;
                 message = e.Message;
+                
+                LogError?.Invoke(e.Message);
             }
 
             if (exitCode != 0 || string.IsNullOrEmpty(message))
@@ -45,7 +50,7 @@ namespace BundleToolUI.Models
             return true;  
         }
 
-        protected abstract Process CreateProcess(string keystorePath, string keystorePassword);
+        protected abstract Process CreateProcess(string keyToolPath, string keystorePath, string keystorePassword);
 
     }
     

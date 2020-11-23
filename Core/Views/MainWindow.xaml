@@ -33,13 +33,16 @@
             <RowDefinition Height="Auto" />    
             <RowDefinition Height="Auto" />    
             <RowDefinition Height="Auto" />    
+            <RowDefinition Height="Auto" />    
+            <RowDefinition Height="Auto" />    
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />    
         </Grid.RowDefinitions>
 
         <DockPanel
-            Grid.Row="0">
+            Grid.Row="0"
+        >
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_File">
                     <MenuItem Header="_Open template...">
@@ -62,13 +65,44 @@
             </Menu>
         </DockPanel>
         
-        <!-- BundleTool path -->
+        <!-- KeyTool path -->
         <TextBlock
             Grid.Row="1"
-            Text="Bundle path:"
+            Text="KeyTool path (empty if it is an environment variable)"
         />
         <Grid
             Grid.Row="2"
+            Margin="0, 0, 0, 4"
+        >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="32" />
+            </Grid.ColumnDefinitions>
+            
+            <TextBox 
+                Grid.Column="0" Grid.Row="0"
+                Margin="0, 0, 4, 0"
+                Watermark="Path/to/KeyTool">
+                <TextBox.Text>
+                    <Binding Path="KeyToolPath" />
+                </TextBox.Text>
+            </TextBox>
+            <Button
+                Content="..."
+                Grid.Column="1" Grid.Row="0">
+                <Button.Command>
+                    <Binding Path="OnKeyToolPathSelectClick" />
+                </Button.Command>
+            </Button>
+        </Grid>
+        
+        <!-- BundleTool path -->
+        <TextBlock
+            Grid.Row="3"
+            Text="Bundle path:"
+        />
+        <Grid
+            Grid.Row="4"
             Margin="0, 0, 0, 4"
         >
             <Grid.ColumnDefinitions>
@@ -95,11 +129,11 @@
         
         <!-- Bundle path -->
         <TextBlock
-            Grid.Row="3"
+            Grid.Row="5"
             Text="Bundle path:"
         />
         <Grid
-            Grid.Row="4"
+            Grid.Row="6"
             Margin="0, 0, 0, 4"
         >
             <Grid.ColumnDefinitions>
@@ -134,11 +168,11 @@
         
         <!-- Apks path -->
         <TextBlock
-            Grid.Row="5"
+            Grid.Row="7"
             Text="Apks path:"
         />
         <Grid
-            Grid.Row="6"
+            Grid.Row="8"
             Margin="0, 0, 0, 4"
         >
             <Grid.ColumnDefinitions>
@@ -167,7 +201,7 @@
         
         <!-- Overwrite output -->
         <CheckBox 
-            Grid.Row="7"
+            Grid.Row="9"
             Margin="0, 0, 0, 4"
             Content="Overwrite output"
         >
@@ -181,12 +215,12 @@
 
         <!-- Keystore path -->
         <TextBlock
-            Grid.Row="8"
+            Grid.Row="10"
             Margin="0, 4, 0, 4"
             Text="Keystore path (if empty - sign with debug):"
         />
         <Grid
-            Grid.Row="9"
+            Grid.Row="11"
             Margin="0, 0, 0, 4"
         >
             <Grid.ColumnDefinitions>
@@ -221,7 +255,7 @@
         
         <!-- Keystore pass, Keystore alias and alias pass -->
         <Grid
-            Grid.Row="10"
+            Grid.Row="12"
             Margin="0, 0, 0, 4"
         >
             <Grid.ColumnDefinitions>
@@ -293,7 +327,7 @@
         
         <!-- Build APK with connected device target -->
         <CheckBox 
-            Grid.Row="11"
+            Grid.Row="13"
             Margin="0, 4, 0, 4"
             Content="Build APK with connected device target"
         >
@@ -307,11 +341,11 @@
 
         <!-- Device ID -->
         <TextBlock
-            Grid.Row="12"
+            Grid.Row="14"
             Text="Device ID (Empty if connected only one device):"
         />
         <TextBox 
-            Grid.Row="13"
+            Grid.Row="15"
             Margin="0, 0, 4, 0"
             Watermark="Device ID">
             <TextBox.Text>
@@ -321,7 +355,7 @@
 
         <!-- Execute mode and execute button -->
         <Grid
-            Grid.Row="14"
+            Grid.Row="16"
             Margin="0, 4, 0, 0"
         >
             <Grid.ColumnDefinitions>
@@ -369,7 +403,7 @@
         <!-- Execute console -->
         
         <TextBox
-            Grid.Row="15"
+            Grid.Row="17"
             Margin="0, 4, 0, 0"
             AcceptsReturn="True" 
             TextWrapping="Wrap"
@@ -381,7 +415,7 @@
         </TextBox>
 
         <ProgressBar
-            Grid.Row="16"
+            Grid.Row="18"
             Margin="0, 4, 0, 0"
         >
             <ProgressBar.IsIndeterminate>

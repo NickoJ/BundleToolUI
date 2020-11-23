@@ -47,6 +47,7 @@ namespace BundleToolUI.ViewModels
             _executor = executor ?? throw new ArgumentNullException(nameof(executor));
             _templatesModule = templatesModule ?? throw new ArgumentNullException(nameof(templatesModule));
 
+            _keyTool.LogError += PrintMessage;
             _executor.LogMessage += PrintMessage;
 
             this.WhenAnyValue(x => x.BundlePath, x => x.ApksPath)
@@ -80,12 +81,23 @@ namespace BundleToolUI.ViewModels
                 .ToProperty(this, x => x.IsOnBuildMode);
         }
 
+        private string KeyToolPath
+        {
+            get => ExecuteParams.KeyToolPath;
+            set
+            {
+                if (string.Equals(ExecuteParams.KeyToolPath, value, StringComparison.Ordinal)) return;
+                ExecuteParams.KeyToolPath = value;
+                this.RaisePropertyChanged(nameof(KeyToolPath));
+            }
+        }
+        
         private string BundleToolPath
         {
             get => ExecuteParams.BundleToolPath;
             set
             {
-                if (string.Equals(ExecuteParams.BundleToolPath, value)) return;
+                if (string.Equals(ExecuteParams.BundleToolPath, value, StringComparison.Ordinal)) return;
                 ExecuteParams.BundleToolPath = value;
                 this.RaisePropertyChanged(nameof(BundleToolPath));
             }
@@ -96,7 +108,7 @@ namespace BundleToolUI.ViewModels
             get => ExecuteParams.BundlePath;
             set
             {
-                if (string.Equals(ExecuteParams.BundlePath, value)) return;
+                if (string.Equals(ExecuteParams.BundlePath, value, StringComparison.Ordinal)) return;
                 ExecuteParams.BundlePath = value;
                 this.RaisePropertyChanged(nameof(BundlePath));
             }
@@ -107,7 +119,7 @@ namespace BundleToolUI.ViewModels
             get => ExecuteParams.ApksPath;
             set
             {
-                if (string.Equals(ExecuteParams.ApksPath, value)) return;
+                if (string.Equals(ExecuteParams.ApksPath, value, StringComparison.Ordinal)) return;
                 ExecuteParams.ApksPath = value;
                 this.RaisePropertyChanged(nameof(ApksPath));
             }
@@ -124,7 +136,7 @@ namespace BundleToolUI.ViewModels
             get => ExecuteParams.KeystorePath;
             set
             {
-                if (string.Equals(ExecuteParams.KeystorePath, value)) return;
+                if (string.Equals(ExecuteParams.KeystorePath, value, StringComparison.Ordinal)) return;
                 ExecuteParams.KeystorePath = value;
                 this.RaisePropertyChanged(nameof(KeystorePath));
             }
@@ -154,7 +166,7 @@ namespace BundleToolUI.ViewModels
             set
             {
                 var newAlias = AvailableAliases[value];
-                if (string.Equals(ExecuteParams.KeystoreAlias, newAlias)) return;
+                if (string.Equals(ExecuteParams.KeystoreAlias, newAlias, StringComparison.Ordinal)) return;
 
                 ExecuteParams.KeystoreAlias = newAlias;
                 this.RaisePropertyChanged(nameof(SelectedAliasIndex));
@@ -207,7 +219,7 @@ namespace BundleToolUI.ViewModels
 
         private void UpdateAliases()
         {
-            if (!_keyTool.GetAliases(KeystorePath, KeystorePassword, out var newAliases)) return;
+            if (!_keyTool.GetAliases(KeyToolPath, KeystorePath, KeystorePassword, out var newAliases)) return;
 
             AvailableAliases.Clear();
             AvailableAliases.AddRange(newAliases);
@@ -272,6 +284,30 @@ namespace BundleToolUI.ViewModels
             _templatesModule.SaveTemplate(path, template);
         }
 
+        private async void OnKeyToolPathSelectClick()
+        {
+            var filters = new List<FileDialogFilter>
+            {
+                new FileDialogFilter
+                {
+                    Name = "KeyTool",
+                    Extensions = new List<string>()
+                }
+            };
+
+            var dialog = new OpenFileDialog
+            {
+                AllowMultiple = false,
+                Filters = filters,
+                Title = "Select keytool"
+            };
+
+            var result = await dialog.ShowAsync(_window);
+            if (result is null || result.Length == 0) return;
+
+            KeyToolPath = result[0];
+        }
+        
         private async void OnBundleToolPathSelectClick()
         {
             var filters = new List<FileDialogFilter>();
@@ -396,6 +432,7 @@ namespace BundleToolUI.ViewModels
 
         private void ApplyTemplate(Template template)
         {
+            KeyToolPath = template.KeyToolPath;
             BundleToolPath = template.BundleToolPath;
             BundlePath = template.BundlePath;
             ApksPath = template.ApksPath;

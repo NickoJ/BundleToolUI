@@ -4,6 +4,7 @@ namespace BundleToolUI.Models
     public class ExecuteParams
     {
 
+        public string KeyToolPath { get; set; }
         public string BundleToolPath { get; set; }
         public string BundlePath { get; set; }
         public string ApksPath { get; set; }
